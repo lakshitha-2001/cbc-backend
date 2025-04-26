@@ -5,6 +5,7 @@ import productRouter from "./routes/productRoute.js";
 import userRouter from "./routes/userRoute.js";
 import jwt from "jsonwebtoken";
 import dotenv from 'dotenv';
+import orderRouter from "./routes/orderRoute.js";
 
 dotenv.config();//.env file එකක තියෙන variables (උදා: MONGO_URI) load කරනවා.
 
@@ -43,6 +44,7 @@ mongoose.connect(process.env.MONGO_URI)
 
 app.use("/products", productRouter);
 app.use("/users", userRouter);
+app.use('/orders', orderRouter);
 
 app.listen(process.env.PORT, () => {
   console.log(`Server is running on port ${process.env.PORT}`);
