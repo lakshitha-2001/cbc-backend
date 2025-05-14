@@ -6,11 +6,12 @@ import userRouter from "./routes/userRoute.js";
 import jwt from "jsonwebtoken";
 import dotenv from 'dotenv';
 import orderRouter from "./routes/orderRoute.js";
+import cors from 'cors';
 
 dotenv.config();//.env file එකක තියෙන variables (උදා: MONGO_URI) load කරනවා.
 
 const app = express();
-
+app.use(cors({}));//cors ekak use karanawa. onema req ekakata access denawa.
 app.use(bodyParser.json());
 
 app.use((req, res, next) => {//middleware ekak wage use karanawa. token ekk check karanawa.
