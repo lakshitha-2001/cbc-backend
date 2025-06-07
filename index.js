@@ -8,30 +8,42 @@ import dotenv from 'dotenv';
 import orderRouter from "./routes/orderRoute.js";
 import cors from 'cors';
 
-dotenv.config();//.env file එකක තියෙන variables (උදා: MONGO_URI) load කරනවා.
+dotenv.config();
+
+if (!process.env.JWT_SECRET) {
+  console.error("JWT_SECRET is not defined in the .env file");
+  process.exit(1);
+}
 
 const app = express();
-app.use(cors({}));//cors ekak use karanawa. onema req ekakata access denawa.
+app.use(cors({}));
 app.use(bodyParser.json());
 
-app.use((req, res, next) => {//middleware ekak wage use karanawa. token ekk check karanawa.
+app.use((req, res, next) => {
   const tokenString = req.header("Authorization");
-  if (tokenString != null) {
+  if (tokenString != null && tokenString.startsWith("Bearer ")) {
     const token = tokenString.replace("Bearer ", "");
 
     jwt.verify(token, process.env.JWT_SECRET, (err, decoded) => {
-      if (decoded != null) {
+      if (err) {
+        console.log("Invalid token:", err.message);
+        return res.status(403).json({
+          message: `Invalid token: ${err.message}`,
+        });
+      }
+      if (decoded) {
         req.user = decoded;
+        // console.log("Decoded token:", decoded);
         next();
       } else {
-        console.log("invalid token");//waradi token ekk nm block karanawa
+        console.log("Invalid token: No decoded payload");
         res.status(403).json({
           message: "Invalid token",
         });
       }
     });
   } else {
-    next();//token ekk nathi unoth yanna denawa
+    next();
   }
 });
 
@@ -39,13 +51,13 @@ mongoose.connect(process.env.MONGO_URI)
   .then(() => {
     console.log("Connected to the database");
   })
-  .catch(() => {
-    console.log("Database connection failed");
+  .catch((err) => {
+    console.error("Database connection failed:", err.message);
   });
 
-app.use("/products", productRouter);
-app.use("/users", userRouter);
-app.use('/orders', orderRouter);
+app.use("/api/products", productRouter);
+app.use("/api/users", userRouter);
+app.use('/api/orders', orderRouter);
 
 app.listen(process.env.PORT, () => {
   console.log(`Server is running on port ${process.env.PORT}`);

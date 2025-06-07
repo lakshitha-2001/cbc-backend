@@ -1,6 +1,6 @@
 import mongoose from "mongoose";
 
-const productSchema = new mongoose.Schema({ //product structure eka define karanawa
+const productSchema = new mongoose.Schema({
   productId: {
     type: String,
     required: true,
@@ -10,10 +10,10 @@ const productSchema = new mongoose.Schema({ //product structure eka define karan
     type: String,
     required: true,
   },
-  altName : [
-    {type: String}
+  altName: [
+    { type: String }
   ],
-  description : {
+  description: {
     type: String,
     required: true,
   },
@@ -22,7 +22,7 @@ const productSchema = new mongoose.Schema({ //product structure eka define karan
   ],
   labelledPrice: {
     type: Number,
-    required: true,
+    required: false
   },
   price: {
     type: Number,

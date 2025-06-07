@@ -25,7 +25,7 @@ const orderSchema = new mongoose.Schema({
   status: {
     type: String,
     required: true,
-    enum: ['pending', 'shipped', 'delivered'],
+    enum: ['pending', 'shipped', 'delivered', 'cancelled'],
     default: 'pending'
   },
   labeledTotal: {
@@ -35,6 +35,18 @@ const orderSchema = new mongoose.Schema({
   total: {
     type: Number,
     required: true
+  },
+  shippingMethod: {
+    type: String,
+    required: true,
+    enum: ['standard', 'express'],
+    default: 'standard'
+  },
+  paymentMethod: {
+    type: String,
+    required: true,
+    enum: ['credit_card', 'paypal', 'cash_on_delivery'],
+    default: 'credit_card'
   },
   products: [{
     productInfo: {
@@ -56,7 +68,7 @@ const orderSchema = new mongoose.Schema({
       images: [{
         type: String
       }],
-      labeledPrice: { // labeledTotal වෙනුවට labeledPrice
+      labeledPrice: {
         type: Number,
         required: false
       },
@@ -67,13 +79,16 @@ const orderSchema = new mongoose.Schema({
     },
     quantity: {
       type: Number,
-      required: true
+      required: true,
+      min: 1
     }
   }],
   date: {
     type: Date,
     default: Date.now
   }
+}, {
+  timestamps: true
 });
 
 export const Order = mongoose.model('Order', orderSchema);
