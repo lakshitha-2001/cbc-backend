@@ -9,11 +9,24 @@ import orderRouter from "./routes/orderRoute.js";
 import cors from 'cors';
 import sliderRouter from "./routes/sliderRoute.js";
 
-dotenv.config();
+// Load .env file only in development
+if (process.env.NODE_ENV !== 'production') {
+  dotenv.config();
+}
 
-if (!process.env.JWT_SECRET) {
-  console.error("JWT_SECRET is not defined in the .env file");
-  process.exit(1);
+// Check for required environment variables
+const requiredEnvVars = ['JWT_SECRET', 'MONGO_URI'];
+const missingEnvVars = requiredEnvVars.filter(varName => !process.env[varName]);
+
+if (missingEnvVars.length > 0) {
+  console.error(`Missing required environment variables: ${missingEnvVars.join(', ')}`);
+  
+  // Don't exit in production - Railway might be setting these through their UI
+  if (process.env.NODE_ENV === 'production') {
+    console.log('Running in production mode - ensure variables are set in Railway dashboard');
+  } else {
+    process.exit(1);
+  }
 }
 
 const app = express();
