@@ -1,9 +1,0 @@
-[deploy]
-startCommand = "npm start"
-
-[build]
-builder = "nixpacks"
-
-[variables]
-MONGO_URI=mongodb+srv://admin:1234@cluster0.i6dv4.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0
-JWT_SECRET=20010424PMLMP#
