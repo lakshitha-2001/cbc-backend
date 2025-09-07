@@ -1,0 +1,9 @@
+[deploy]
+startCommand = "npm start"
+
+[build]
+builder = "nixpacks"
+
+[variables]
+JWT_SECRET = "your-jwt-secret-here"
+MONGO_URI = "your-mongodb-connection-string"
