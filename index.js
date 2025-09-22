@@ -9,17 +9,59 @@ import orderRouter from "./routes/orderRoute.js";
 import cors from 'cors';
 import sliderRouter from "./routes/sliderRoute.js";
 
-dotenv.config();
+// Load .env file only in development
+if (process.env.NODE_ENV !== 'production') {
+  dotenv.config();
+}
 
-if (!process.env.JWT_SECRET) {
-  console.error("JWT_SECRET is not defined in the .env file");
-  process.exit(1);
+// Check for required environment variables
+const requiredEnvVars = ['JWT_SECRET', 'MONGO_URI'];
+const missingEnvVars = requiredEnvVars.filter(varName => !process.env[varName]);
+
+if (missingEnvVars.length > 0) {
+  console.error(`Missing required environment variables: ${missingEnvVars.join(', ')}`);
+  
+  if (process.env.NODE_ENV === 'production') {
+    console.log('Running in production mode - ensure variables are set in Railway dashboard');
+  } else {
+    process.exit(1);
+  }
 }
 
 const app = express();
-app.use(cors({}));
+
+// Secure CORS configuration
+const allowedOrigins = [
+  "http://localhost:5173",
+  "http://localhost:3000", 
+  "http://localhost:5000"
+];
+
+if (process.env.FRONTEND_URL) {
+  allowedOrigins.push(process.env.FRONTEND_URL);
+}
+
+app.use(cors({
+  origin: function (origin, callback) {
+    if (!origin) return callback(null, true);
+    
+    if (allowedOrigins.includes(origin)) {
+      return callback(null, true);
+    }
+    
+    if (origin.includes('.up.railway.app')) {
+      return callback(null, true);
+    }
+    
+    const msg = 'CORS policy: Origin not allowed';
+    return callback(new Error(msg), false);
+  },
+  credentials: true
+}));
+
 app.use(bodyParser.json());
 
+// ... rest of your code remains the same
 app.use((req, res, next) => {
   const tokenString = req.header("Authorization");
   if (tokenString != null && tokenString.startsWith("Bearer ")) {
@@ -34,7 +76,6 @@ app.use((req, res, next) => {
       }
       if (decoded) {
         req.user = decoded;
-        // console.log("Decoded token:", decoded);
         next();
       } else {
         console.log("Invalid token: No decoded payload");
@@ -61,6 +102,7 @@ app.use("/api/users", userRouter);
 app.use('/api/orders', orderRouter);
 app.use("/api/sliders", sliderRouter);
 
-app.listen(process.env.PORT, () => {
-  console.log(`Server is running on port ${process.env.PORT}`);
+const PORT = process.env.PORT || 5000;
+app.listen(PORT, () => {
+  console.log(`Server is running on port ${PORT}`);
 });
