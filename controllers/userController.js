@@ -340,3 +340,79 @@ export async function verifyOTP(req, res) {
     return res.status(500).json({ message: 'Something went wrong' });
   }
 }
+
+
+// Get user by ID
+export function getUserById(req, res) {
+  // if (!req.user || req.user.role !== 'admin') {
+  //   return res.status(403).json({ message: 'Unauthorized: Admin access required' });
+  // }
+
+  User.findById(req.params.id).select('-password')
+    .then((user) => {
+      if (!user) {
+        return res.status(404).json({ message: 'User not found' });
+      }
+      res.status(200).json(user);
+    })
+    .catch((error) => {
+      res.status(500).json({
+        message: 'Error fetching user',
+        error: error.message,
+      });
+    });
+}
+
+// Update user
+export function updateUser(req, res) {
+  // if (!req.user || req.user.role !== 'admin') {
+  //   return res.status(403).json({ message: 'Unauthorized: Admin access required' });
+  // }
+
+  const updateData = { ...req.body };
+  
+  // If password is being updated, hash it
+  if (updateData.password) {
+    updateData.password = bcrypt.hashSync(updateData.password, 10);
+  }
+
+  User.findByIdAndUpdate(req.params.id, updateData, { new: true }).select('-password')
+    .then((updatedUser) => {
+      if (!updatedUser) {
+        return res.status(404).json({ message: 'User not found' });
+      }
+      res.status(200).json({
+        message: 'User updated successfully',
+        user: updatedUser,
+      });
+    })
+    .catch((error) => {
+      res.status(400).json({
+        message: 'Error updating user',
+        error: error.message,
+      });
+    });
+}
+
+// Delete user
+export function deleteUser(req, res) {
+  // if (!req.user || req.user.role !== 'admin') {
+  //   return res.status(403).json({ message: 'Unauthorized: Admin access required' });
+  // }
+
+  User.findByIdAndDelete(req.params.id)
+    .then((deletedUser) => {
+      if (!deletedUser) {
+        return res.status(404).json({ message: 'User not found' });
+      }
+      res.status(200).json({
+        message: 'User deleted successfully',
+      });
+    })
+    .catch((error) => {
+      res.status(500).json({
+        message: 'Error deleting user',
+        error: error.message,
+      });
+    });
+}
