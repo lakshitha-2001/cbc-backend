@@ -32,9 +32,10 @@ const app = express();
 
 // Secure CORS configuration
 const allowedOrigins = [
-  "http://localhost:5173",
+  "http://localhost:4173",
   "http://localhost:3000", 
-  "http://localhost:5000"
+  "http://localhost:5000",
+  "http://localhost:5173"
 ];
 
 if (process.env.FRONTEND_URL) {
