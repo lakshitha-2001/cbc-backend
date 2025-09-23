@@ -36,7 +36,7 @@ const allowedOrigins = [
   "http://localhost:3000", 
   "http://localhost:5000",
   "http://localhost:5173",
-  "https://your-vercel-app.vercel.app" // Add your Vercel URL here
+  "https://cbc-frontend-eight.vercel.app"
 ];
 
 if (process.env.FRONTEND_URL) {
@@ -45,15 +45,13 @@ if (process.env.FRONTEND_URL) {
 
 app.use(cors({
   origin: function (origin, callback) {
-    // Allow requests with no origin (like mobile apps or curl requests)
     if (!origin) return callback(null, true);
     
     if (allowedOrigins.includes(origin)) {
       return callback(null, true);
     }
     
-    // Allow all Railway and Vercel subdomains
-    if (origin.includes('.railway.app') || origin.includes('.vercel.app')) {
+    if (origin.includes('.up.railway.app')) {
       return callback(null, true);
     }
     
